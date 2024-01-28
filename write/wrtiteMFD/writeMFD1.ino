@@ -25,7 +25,7 @@ unsigned int i;
 MCP_CAN CAN(10);                                            // Set CS to pin 10
 
 void setup() {   
-	Serial.begin(230400);
+	Serial.begin(115200);
 	START_INIT:
 	if(CAN_OK == CAN.begin(CAN_500KBPS)) {
         	Serial.println("CAN BUS Shield init ok!");
