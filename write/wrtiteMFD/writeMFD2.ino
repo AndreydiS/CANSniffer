@@ -91,7 +91,7 @@ if (Serial.available() > 0) {
     	SendStringAsCan(canId,"c4,25,26,27,28,29,2a,2b");
     	SendStringAsCan(canId,"c5,2c,2e,2f,4a,00,00,01");
     	SendStringAsCan(canId,"c6,00,00,00");
-		delay(900);
+		delay(1900);
 		Serial.println("sending message for Audio. 0x90 0xd0");
 		SendStringAsCan(canId,"90,31,4c,55,0d,30,78,39");
 		SendStringAsCan(canId,"d0,30,20,30,78,64,30,20");
@@ -101,7 +101,7 @@ if (Serial.available() > 0) {
 		SendStringAsCan(canId,"d4,25,26,27,28,29,2a,2b");
 		SendStringAsCan(canId,"d5,2c,2e,2f,4a,00,00,01");
 		SendStringAsCan(canId,"d6,00,00,00");
-		delay(900);
+		delay(1900);
 		Serial.println("sending message for Audio. 0xa0 0xe0");
 		SendStringAsCan(canId,"a0,31,4c,55,0d,30,78,61");
 		SendStringAsCan(canId,"e0,30,20,30,78,65,30,20");
@@ -111,7 +111,7 @@ if (Serial.available() > 0) {
 		SendStringAsCan(canId,"e4,25,26,27,28,29,2a,2b");
 		SendStringAsCan(canId,"e5,2c,2e,2f,4a,00,00,01");
 		SendStringAsCan(canId,"e6,00,00,00");
-		delay(900);
+		delay(1900);
 		Serial.println("sending message for Audio. 0xb0 0xf0");
 		SendStringAsCan(canId,"b0,31,4c,55,0d,30,78,62");
 		SendStringAsCan(canId,"f0,30,20,30,78,66,30,20");
@@ -121,7 +121,7 @@ if (Serial.available() > 0) {
 		SendStringAsCan(canId,"f4,25,26,27,28,29,2a,2b");
 		SendStringAsCan(canId,"f5,2c,2e,2f,4a,00,00,01");
 		SendStringAsCan(canId,"f6,00,00,00");
-		delay(900);
+		delay(1900);
 	}
 
 	if (incomingByte == 0x31) {
