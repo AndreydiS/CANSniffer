@@ -41,49 +41,59 @@ $MessageLenght = ($out -split "," | measure).count -3
 
 $out=$out.replace("<LM>", ('{0:X}' -f $MessageLenght))
 
-$i=1
-$startCode = "80,"
-$consecutiveCode = 0xC0
-
-$toSerial = $startCode
-
-write-host $startCode -NoNewline
+$startCode = 0x80
+$consecutiveCode = 0xBF#0xC0
+$toSerial=""
+$i=0
 $out -split "," | % {
-    write-host ($_+",") -NoNewline
-    $toSerial += $_+","
-    if ($i -ge 7) {
-        write-host
-        write-host (('{0:X}' -f $consecutiveCode)+",") -NoNewline
-        $toSerial += ('{0:X}' -f $consecutiveCode)+","
-        $consecutiveCode++
-        $i=0
+    if ($i -eq 0) {
+        if ($consecutiveCode -eq 0xBF) {
+            $prefixByte = $startCode
+        } else {
+            $prefixByte = $consecutiveCode
+        }
+        write-host (('{0:X}' -f $prefixByte)+",") -NoNewline
+        $toSerial += ('{0:X}' -f $prefixByte)+","
+        
+        $consecutiveCode++;
     }
-    $i++;
+    $toSerial += $_+","
+    write-host ($_+",") -NoNewline
+    if ($i -ge 6) {
+        write-host
+        $i=0
+    } else {
+        $i++
+    }
 }
-write-host
-
-$toSerial = $toSerial.Replace(",C7,","")
 
 
-[byte[]] $b = 0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37
+[byte[]] $b = 0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0
 
-$port1 = new-Object System.IO.Ports.SerialPort COM8,115200
+$port1 = new-Object System.IO.Ports.SerialPort COM6,115200
 $port1.Open()
 sleep 1
+$port1.ReadExisting()
+sleep 1
 $i = 0
+$byteCount = 0
 $toSerial -split "," | % {
-    
-    $b[$i] = [byte][System.Convert]::ToInt64($_, 16)
-    $i++
-    if ($i -ge 8) {
-        #write-host $b[0] $b[1]
-        $port1.Write($b,0,8)
-        sleep 1
-        write-host "---"
-        $port1.ReadExisting()
-        $i=0
+    $byte = $_
+    if ($byte -ne "") {
+        $b[$i] = [byte][System.Convert]::ToInt64($byte, 16)
+        $byteCount++
+        if ($i -ge 7) {
+            $port1.Write($b,0,8)
+            if ($byteCount -gt 40) {
+                sleep 1
+            }
+            $i=0
+        } else {
+            $i++
+        }
     }
-    
 }
+sleep 2
+$port1.ReadExisting()
 
 $port1.Close()
