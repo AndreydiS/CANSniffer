@@ -41,7 +41,7 @@ $MessageLenght = ($out -split "," | measure).count -3
 
 $out=$out.replace("<LM>", ('{0:X}' -f $MessageLenght))
 
-$i=0
+$i=1
 $startCode = "80,"
 $consecutiveCode = 0xC0
 
@@ -51,7 +51,6 @@ write-host $startCode -NoNewline
 $out -split "," | % {
     write-host ($_+",") -NoNewline
     $toSerial += $_+","
-    $i++;
     if ($i -ge 7) {
         write-host
         write-host (('{0:X}' -f $consecutiveCode)+",") -NoNewline
@@ -59,5 +58,32 @@ $out -split "," | % {
         $consecutiveCode++
         $i=0
     }
+    $i++;
 }
 write-host
+
+$toSerial = $toSerial.Replace(",C7,","")
+
+
+[byte[]] $b = 0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37
+
+$port1 = new-Object System.IO.Ports.SerialPort COM8,115200
+$port1.Open()
+sleep 1
+$i = 0
+$toSerial -split "," | % {
+    
+    $b[$i] = [byte][System.Convert]::ToInt64($_, 16)
+    $i++
+    if ($i -ge 8) {
+        #write-host $b[0] $b[1]
+        $port1.Write($b,0,8)
+        sleep 1
+        write-host "---"
+        $port1.ReadExisting()
+        $i=0
+    }
+    
+}
+
+$port1.Close()
