@@ -7,13 +7,15 @@ MCP_CAN CAN(10); // Set CS to pin 10
 #define delayLastMessage 100
 
 
-//byte incomingByte;
+byte incomingByte;
 byte bitCount=0;
 byte availableBytes = 0;
 byte bufsize = 0;
+unsigned long timeLastByteReceived = 0;
 
-
-unsigned char buf[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+//unsigned char buf[256] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+unsigned char buf[256];
+unsigned char bufToSend[8];
 
 void setup() {
   Serial.begin(9600);
@@ -29,11 +31,45 @@ void setup() {
 }
 
 void loop() {
+
+if (((millis() - timeLastByteReceived) > 1000) && (bitCount>0)) {
+  Serial.println("No new bytes received. Sending. ");
+  byte j=0;
+  for (int i = 0; i <= (bitCount-1); i++) {
+    bufToSend[j] = buf[i];
+    Serial.print(buf[i],HEX);  
+    Serial.print(",");  
+    if (j >=7) {
+      Serial.println(); 
+      Serial.println("Sending 8 bytes: "); 
+      CAN.sendMsgBuf(canId, 1, 8, bufToSend);
+      j=0;
+    } else {
+      j++;
+    }
+  }
+  if (j >0) {
+      Serial.print("Sending last chunk of bytes: ");  
+      Serial.println(j);  
+      CAN.sendMsgBuf(canId, 1, j, bufToSend);
+  }
+  bitCount = 0;
+}
+
+if (Serial.available() > 0) {
+  incomingByte = Serial.read();
+  buf[bitCount] = incomingByte;
+  timeLastByteReceived = millis();
+  bitCount++;
+}
+/*
   availableBytes = Serial.available();
   if (availableBytes > 0) {
+
     if (availableBytes >=8) { //8 or more bytes received - reading
       Serial.print("bytes read by8 ");  
       Serial.println(availableBytes);  
+      bitCount+=8;
       bufsize = 8;
     } else {
       delay(delayLastMessage);  
@@ -54,5 +90,6 @@ void loop() {
       CAN.sendMsgBuf(canId, 1, bufsize, buf);
       bufsize = 0;
     }
-  }
+    */
+
 }
