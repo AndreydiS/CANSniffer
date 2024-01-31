@@ -4,13 +4,19 @@ INT32U canId = 0x0;
 unsigned char len = 0;
 byte incomingByte;
 
+#define CANCRYSTAL 8 // 8 or 16 MHZ
 
 MCP_CAN CAN(10);                                            // Set CS to pin 10
 
 void setup() {   
 	Serial.begin(115200);
 	START_INIT:
+#if CANCRYSTAL == 8
+	if(CAN_OK == CAN.begin(CAN_500KBPS,MCP_8MHz)) {
+#endif
+#if CANCRYSTAL == 16
 	if(CAN_OK == CAN.begin(CAN_500KBPS)) {
+#endif
         	Serial.println("CAN BUS Shield init ok!");
     	} else {
         	Serial.println("CAN BUS Shield init fail");
@@ -126,30 +132,6 @@ if (Serial.available() > 0) {
 
 	if (incomingByte == 0x31) {
       	Serial.println("1. b10 enable cam");
-		SendStringAsCan(0x6af,"70,00,35,32,1e,00,00,00");
-		//SendStringAsCan(0x17330b10,"42,d6,38");				delay(45);
-		SendStringAsCan(0x17330b10,"42,d6,18");        delay(45);
-		SendStringAsCan(0x17330b10,"42,da,f1,01,01,01");	delay(20);
-		SendStringAsCan(0x17330a10,"42,95,f1,01");			delay(20);
-      	SendStringAsCan(0x17330a00,"22,95,11,01");
-		SendStringAsCan(0x17330b10,"42,e2,01,01");			delay(20);
-		SendStringAsCan(0x17330a10,"42,92,ff,ff,ff,ff,00,00");
-		SendStringAsCan(0x6af,"71,00,35,32,1e,00,00,00");	delay(50);
-		SendStringAsCan(0x3da,"22,08,00,00,00,f8,11,03");	delay(40);
-		SendStringAsCan(0x17330b10,"42,da,11,01,01,01");
-      	delay(100);
-		SendStringAsCan(0x3da,"22,08,00,00,00,f8,11,03");
-		SendStringAsCan(0x6af,"71,00,35,32,1e,00,00,00");
-      	delay(100);
-		SendStringAsCan(0x3da,"22,08,00,00,00,f8,11,03");
-		SendStringAsCan(0x6af,"71,00,35,32,1e,00,00,00");
-      	delay(100);
-		SendStringAsCan(0x3da,"22,08,00,00,00,f8,11,03");
-		SendStringAsCan(0x6af,"71,00,35,32,1e,00,00,00");
-      	delay(100);
-		SendStringAsCan(0x3da,"22,08,00,00,00,f8,11,03");
-		SendStringAsCan(0x6af,"71,00,35,32,1e,00,00,00");
-
 	}
 
 	if (incomingByte == 0x32) {

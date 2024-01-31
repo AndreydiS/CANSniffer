@@ -71,6 +71,7 @@ $out -split "," | % {
 [byte[]] $b = 0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0
 
 $port1 = new-Object System.IO.Ports.SerialPort COM6,115200
+
 $port1.Open()
 sleep 1
 $port1.ReadExisting()
@@ -83,16 +84,22 @@ $toSerial -split "," | % {
         $b[$i] = [byte][System.Convert]::ToInt64($byte, 16)
         $byteCount++
         if ($i -ge 7) {
+            #$port1.Open()
             $port1.Write($b,0,8)
+            #$port1.ReadExisting()
+            #$port1.Close()
             if ($byteCount -gt 40) {
-                sleep 1
+                $byteCount = 0
+                sleep .6
             }
             $i=0
-        } else {
-            $i++
-        }
+        } else { $i++}
     }
 }
+if ($i -gt 0) { #something left to sent
+    $port1.Write($b,0,$i)
+}
+
 sleep 2
 $port1.ReadExisting()
 
