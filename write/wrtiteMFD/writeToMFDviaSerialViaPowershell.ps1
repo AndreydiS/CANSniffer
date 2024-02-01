@@ -18,14 +18,15 @@
 #$Album = "Tic Tac Toe"
 #$Song = "Verpiss' Dich"
 
-$Artist = "Manowar"
-$Album = "The Hell Of Steel (7567123"
-$Song = "Blow Your Speakers"
 
 $Artist = "Helix Lite"
 $Album = "v.6"
 $Song = "Vol: 12 Sub: 92 DigIn: On "
 
+
+$Artist = "manowarabcdef123" # max Manowarabcdef12... manowarabcdef12... manowarabcdef123 
+$Album = "the hell of steel (71" #max The Hell Of Steel (...    the hell of steel (7...    
+$Song = "B`nYT" #max Blow Your Speakers Blow ... # 2 lines only  `n may be used for new line
 
 $out = "<LM>,4c,55,"
 $out +=('{0:X}' -f $Song.Length) + ","
@@ -68,26 +69,29 @@ $out -split "," | % {
 }
 
 
-$b =[byte]1..41
 $bytesToSendInOneTransmission = 33
 
-$port1 = new-Object System.IO.Ports.SerialPort COM4,9600
+$b =[byte]1..($bytesToSendInOneTransmission+1)
+for ($i=0;$i -le $bytesToSendInOneTransmission;$i++) {
+    $b[$i]=[byte]0x00
+}
 
+$port1 = new-Object System.IO.Ports.SerialPort COM7,9600
 $port1.Open()
+sleep 1
 $port1.ReadExisting()
+
 
 $byteCount = 0
 $toSerial -split "," | % {
     $byte = $_
     if ($byte -ne "") {
         $b[$byteCount] = [byte][System.Convert]::ToInt64($byte, 16)
-            if ($byteCount -ge $bytesToSendInOneTransmission) {
+        if ($byteCount -ge $bytesToSendInOneTransmission) {
                 $port1.Write($b,0,$bytesToSendInOneTransmission+1)
                 $byteCount = 0
                 sleep .6
-            } else {
-                $byteCount++
-            }
+            } else { $byteCount++ }
     }
 }
 if ($byteCount -gt 0) { #something left to sent
