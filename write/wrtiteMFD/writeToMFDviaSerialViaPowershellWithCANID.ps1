@@ -18,7 +18,7 @@
 #$Album = "Tic Tac Toe"
 #$Song = "Verpiss' Dich"
 
-$comPort = "COM4"
+$comPort = "COM7"
 
 $Artist = "Helix Lite"
 $Album = "v.6"

@@ -47,8 +47,7 @@ void loop() {
         Serial.print(buf[i],HEX);  
         Serial.print(",");  
         if (j >=7) {
-          
-          Serial.println(" <-Sending 8 bytes"); 
+          Serial.println(" S"); 
           CAN.sendMsgBuf(canId, 1, 8, bufToSend);
           j=0;
         } else {
@@ -56,8 +55,7 @@ void loop() {
         }
       }
       if (j >0) {
-        
-        Serial.print(" <-Sending last bytes: ");  
+        Serial.print(" SL ");  
         Serial.println(j);            
         CAN.sendMsgBuf(canId, 1, j, bufToSend);
       }
