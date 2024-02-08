@@ -39,16 +39,23 @@ void loop() {
         tempCanId = buf[i];
         canId = canId*0x100 + tempCanId;
       }
-      Serial.print("CAN ID: "); 
-      Serial.println(canId, HEX); 
       byte j=0;
+      byte extFrame = 0;
+      if (canId > 0x7ff) {
+        extFrame = 1;
+      }
+      Serial.print("CAN ID: ");
+      Serial.print(canId, HEX); 
+      Serial.print(" Ext: "); 
+      Serial.println(extFrame, HEX); 
+      
       for (int i = (buf[3]+4); i <= (bitCount-1); i++) {
         bufToSend[j] = buf[i];
         Serial.print(buf[i],HEX);  
         Serial.print(",");  
         if (j >=7) {
           Serial.println(" S"); 
-          CAN.sendMsgBuf(canId, 1, 8, bufToSend);
+          CAN.sendMsgBuf(canId, extFrame, 8, bufToSend);
           j=0;
         } else {
           j++;
@@ -57,7 +64,7 @@ void loop() {
       if (j >0) {
         Serial.print(" SL ");  
         Serial.println(j);            
-        CAN.sendMsgBuf(canId, 1, j, bufToSend);
+        CAN.sendMsgBuf(canId, extFrame, j, bufToSend);
       }
     } else {
       Serial.println("wrong command, try again "); 

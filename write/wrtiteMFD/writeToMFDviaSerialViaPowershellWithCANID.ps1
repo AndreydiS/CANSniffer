@@ -27,9 +27,17 @@ $Song = "Vol: 12 Sub: 92 DigIn: On "
 
 $Artist = "manowarabcdef123" # max Manowarabcdef12... manowarabcdef12... manowarabcdef123 
 $Album = "the hell of steel (71" #max The Hell Of Steel (...    the hell of steel (7...    
-$Song = "B`nYT2" #max Blow Your Speakers Blow ... # 2 lines only  `n may be used for new line
+$Song = "Blow Your Speakers Blow1" #max Blow Your Speakers Blow ... # 2 lines only  `n may be used for new line
 $CANID = "17333111"
 #$CANID = "5bf"
+
+
+$Artist = "ffffffffffffffff" # max Manowarabcdef12... manowarabcdef12... manowarabcdef123 
+$Album = "fffffffffffffffffffff" #max The Hell Of Steel (...    the hell of steel (7...    
+$Song = "ffffffffffffffffffffffff" #max Blow Your Speakers Blow ... # 2 lines only  `n may be used for new line
+$CANID = "17333111"
+
+
 
 $canIDSplit = ""
 if ($CANID.length%2 -eq 1) {$CANID="0"+$CANID}
