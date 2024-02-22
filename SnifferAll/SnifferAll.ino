@@ -4,7 +4,7 @@
 
 #define CanCrystal 16 //MHZ 8 or 16
 
-INT32U canId = 0x000;
+INT32U canId = 0x0;
 //INT8U canRtr = 0x0;
 //INT8U canExF = 0x0;
 unsigned char len = 0;

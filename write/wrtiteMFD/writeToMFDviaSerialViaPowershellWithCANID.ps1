@@ -37,27 +37,34 @@ $Album = "fffffffffffffffffffff" #max The Hell Of Steel (...    the hell of stee
 $Song = "ffffffffffffffffffffffff" #max Blow Your Speakers Blow ... # 2 lines only  `n may be used for new line
 $CANID = "17333111"
 
+$Artist = "f" # max Manowarabcdef12... manowarabcdef12... manowarabcdef123 
+$Album = "f" #max The Hell Of Steel (...    the hell of steel (7...    
+$Song = "f" #max Blow Your Speakers Blow ... # 2 lines only  `n may be used for new line
+$CANID = "17333111"
+$CANID = "000005bf"
+
 
 
 $canIDSplit = ""
 if ($CANID.length%2 -eq 1) {$CANID="0"+$CANID}
 for ($i=$CANID.length-1;$i -ge 0 ;$i--) {$canIDSplit=$CANID[$i]+$canIDSplit; if ($i%2 -eq 0) {$canIDSplit=","+$canIDSplit}};
-$serialCMDprefix="61,74,20,"+[math]::ceiling($CANID.length/2)+$canIDSplit+","
+#$serialCMDprefix="61,74,20,"+('{0:X2}' -f [int][math]::ceiling($CANID.length/2))+$canIDSplit+","
+$serialCMDprefix="61,74,20"+$canIDSplit+","
 $serialCMDprefix
 
 $out = "<LM>,4c,55,"
-$out +=('{0:X}' -f $Song.Length) + ","
+$out +=('{0:X2}' -f $Song.Length) + ","
 
 $Song.ToCharArray() | % {$hex= ([Convert]::ToString(([byte][char]$_),16)); $out += $hex+"," }
-$out += "48,00,00,"+ ('{0:X}' -f $Artist.Length) + ","
+$out += "48,00,00,"+ ('{0:X2}' -f $Artist.Length) + ","
 $Artist.ToCharArray() | % {$hex= ([Convert]::ToString(([byte][char]$_),16)); $out += $hex+"," }
-$out += "49,"+ ('{0:X}' -f $Album.Length) + ","
+$out += "49,"+ ('{0:X2}' -f $Album.Length) + ","
 $Album.ToCharArray() | % {$hex= ([Convert]::ToString(([byte][char]$_),16)); $out += $hex+"," }
 $out += "4a,00,00,01,00,00,00"
 
 $MessageLenght = ($out -split "," | measure).count -3
 
-$out=$out.replace("<LM>", ('{0:X}' -f $MessageLenght))
+$out=$out.replace("<LM>", ('{0:X2}' -f $MessageLenght))
 
 $startCode = 0x80
 $consecutiveCode = 0xBF#0xC0
@@ -85,6 +92,8 @@ $out -split "," | % {
     }
 }
 
+$serialCMDprefix+'-01,01,-'+$toSerial
+
 $bytesToSendInOneTransmission = 33
 
 $b =[byte]1..($bytesToSendInOneTransmission+1)
@@ -99,7 +108,7 @@ $port1.ReadExisting()
 
 
 $byteCount = 0
-($serialCMDprefix+$toSerial) -split "," | % {
+($serialCMDprefix+'01,01,'+$toSerial) -split "," | % {
     $byte = $_
     if ($byte -ne "") {
         $b[$byteCount] = [byte][System.Convert]::ToInt64($byte, 16)
