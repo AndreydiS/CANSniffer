@@ -92,7 +92,8 @@ $out -split "," | % {
     }
 }
 
-$serialCMDprefix+'-01,01,-'+$toSerial
+write-host ""
+write-host ($serialCMDprefix+'-01,01,-'+$toSerial)
 
 $bytesToSendInOneTransmission = 33
 

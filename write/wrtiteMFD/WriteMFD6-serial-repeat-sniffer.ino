@@ -50,9 +50,8 @@ void loop() {
     if (buf[0] == 0x61 && buf[1] == 0x74 && buf[2] == 0x20) { //at_
       sniffingMode = 0;
       canId = 0x00;
-      byte bufCount=0;
-      bufCount = 4+2;
-      for (int i = 4; i <= bufCount; i++) {
+      byte bufCount=6;
+      for (int i = 3; i <= bufCount; i++) {
         tempCanId = buf[i];
         canId = canId*0x100 + tempCanId;
       }
@@ -110,13 +109,21 @@ void loop() {
       if (buf[0] == 0x61 && buf[1] == 0x73 && buf[2] == 0x20) { //as_ sniffing
         Serial.println("Sniffing "); 
         sniffingMode = 1;
+        Serial.print("CAN ID: ");
+        Serial.print(canId, HEX); 
+
         canId = 0x00;
-        byte bufCount=0;
-        bufCount = 4+2;
-        for (int i = 4; i <= bufCount; i++) {
+        byte bufCount=6;
+        for (int i = 3; i <= bufCount; i++) {
           tempCanId = buf[i];
           canId = canId*0x100 + tempCanId;
         }
+      
+        byte extFrame = 0;
+        if (canId > 0x7ff) {
+          extFrame = 1;
+        }
+
         if (canId > 0x07ff) {
             CAN.init_Mask(1, 1, 0x1fffffff);
             CAN.init_Filt(extFilterCount, 1, canId);
