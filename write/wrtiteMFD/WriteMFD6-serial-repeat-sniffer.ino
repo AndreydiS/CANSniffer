@@ -57,13 +57,9 @@ void loop() {
       }
       
       byte extFrame = 0;
-      if (canId > 0x7ff) {
-        extFrame = 1;
-      }
-      Serial.print("CAN ID: ");
-      Serial.print(canId, HEX); 
-      Serial.print(" Ext: "); 
-      Serial.println(extFrame, HEX); 
+      if (canId > 0x7ff) {extFrame = 1;}
+      Serial.print("CAN ID: "); Serial.print(canId, HEX); 
+      Serial.print(" Ext: ");   Serial.println(extFrame, HEX); 
 
       byte repeatCount = 1;
       unsigned int repeatPeriod = 0;
@@ -72,13 +68,9 @@ void loop() {
       bufCount++;
       repeatPeriod = (buf[bufCount])*10; //ms
 
-      Serial.print("repeatCount: ");
-      Serial.print(repeatCount, HEX); 
+      Serial.print("repeatCount: ");   Serial.print(repeatCount, HEX); 
+      Serial.print(" repeatPeriod: "); Serial.println(repeatPeriod, HEX); //ms
 
-      Serial.print(" repeatPeriod: ");
-      Serial.println(repeatPeriod, HEX); //ms
-
-    //add loop and time control here
       bufCount++;
       for (byte a=1; a<=repeatCount; a++) {
         do {
@@ -88,19 +80,15 @@ void loop() {
         Serial.println(millis(),DEC);  
         for (byte i = (bufCount); i <= (bitCount-1); i++) {
           bufToSend[j] = buf[i];
-          //Serial.print(buf[i],HEX);  
-          //Serial.print(",");  
+          //Serial.print(buf[i],HEX); Serial.print(",");  
           if (j >=7) {
             //Serial.println(" S"); 
             CAN.sendMsgBuf(canId, extFrame, 8, bufToSend);
             j=0;
-          } else {
-            j++;
-          }
+          } else {j++;}
         }
         if (j >0) {
-          //Serial.print(" SL ");  
-          //Serial.println(j);            
+          //Serial.print(" SL "); Serial.println(j);            
           CAN.sendMsgBuf(canId, extFrame, j, bufToSend);
         }
         timeLastSent = millis();
