@@ -37,6 +37,8 @@ $Album = "fffffffffffffffffffff" #max The Hell Of Steel (...    the hell of stee
 $Song = "ffffffffffffffffffffffff" #max Blow Your Speakers Blow ... # 2 lines only  `n may be used for new line
 $CANID = "17333111"
 
+#61,74,20,00,00,05,bf,01,01,0c,00,01,23
+
 $Artist = "f" # max Manowarabcdef12... manowarabcdef12... manowarabcdef123 
 $Album = "f" #max The Hell Of Steel (...    the hell of steel (7...    
 $Song = "f" #max Blow Your Speakers Blow ... # 2 lines only  `n may be used for new line
