@@ -28,7 +28,7 @@ unsigned char buf[256];
 unsigned char bufToSend[8];
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
 	START_INIT:
     #if CanCrystal == 8
       if(CAN_OK == CAN.begin(CAN_500KBPS,MCP_8MHz)) {
