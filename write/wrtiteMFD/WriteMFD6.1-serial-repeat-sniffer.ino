@@ -93,27 +93,30 @@ void loop() {
             }
         } else { //as_ sniffing mode
             sniffingMode = 1;
-            if (extFrame == 1) {
+            if (canId == 0x0) {
+              Serial.print("Sniffing all");
+            } else {
+              if (extFrame == 1) {
                 CAN.init_Mask(1, 1, 0x1fffffff);
                 CAN.init_Filt(extFilterCount, 1, canId);
                 Serial.print("ext fltr ");
                 Serial.println(extFilterCount);
                 extFilterCount++;
                 if (extFilterCount > 5) {
-                extFilterCount = 2;
+                  extFilterCount = 2;
                 }
-            } else {
+              } else {
                 CAN.init_Mask(0, 0, 0x07ff);
                 CAN.init_Filt(stdFilterCount, 0, canId);
                 Serial.print("std fltr");
                 Serial.println(stdFilterCount);
                 stdFilterCount++;
                 if (stdFilterCount > 1) {
-                stdFilterCount = 0;
+                  stdFilterCount = 0;
                 }
+              }
             }
         }
-
     } else {
         Serial.println("wrong command, try again ");
     }
