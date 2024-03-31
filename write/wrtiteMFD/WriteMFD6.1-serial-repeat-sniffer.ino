@@ -25,6 +25,7 @@ unsigned long timeLastByteReceived = 0;
 unsigned long timeLastSent = 0;
 
 unsigned char buf[256];
+unsigned char bufs[256];
 unsigned char bufToSend[8];
 
 void setup() {
@@ -36,7 +37,8 @@ void setup() {
     #if CanCrystal == 16
       if(CAN_OK == CAN.begin(CAN_500KBPS)) {
     #endif
-        	Serial.println("CAN ok. CMD: at <canid_4b><repeatCount_1b><repeatPeriod_1b><payload>");
+        	Serial.println("CAN ok. CMD send: 61 74 20 <canid_4b> <repeatCount_1b> <repeatPeriod_1b> <payload>");
+          Serial.println("CAN ok. CMD sniff: 61 73 20 <canid_4b>");
     	} else {
         	Serial.println("CAN BUS Shield init fail");
         	delay(100);
@@ -125,16 +127,16 @@ void loop() {
   
   if (sniffingMode == 1) {
     if (CAN_MSGAVAIL == CAN.checkReceive()) {
-      CAN.readMsgBuf(&len, buf);
+      CAN.readMsgBuf(&len, bufs);
       canId = CAN.getCanId();
       stringOut = "";
         stringOut.concat(String(canId,HEX));
         for (byte i=0; i<len; i++) {
           stringOut.concat(",");
-          if (buf[i] < 0x10) {
+          if (bufs[i] < 0x10) {
             stringOut.concat(" ");
           }
-          stringOut.concat(String(buf[i],HEX));
+          stringOut.concat(String(bufs[i],HEX));
         }
         Serial.println(stringOut);
     }
