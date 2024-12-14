@@ -1,6 +1,8 @@
 #include <SPI.h>
 #include <mcp_can.h>
 
+#define CanCrystal 16 //MHZ 8(on my controllers) or 16(on UNO)
+
 #define arraySize 4
 
 unsigned long arrCanID[arraySize];
@@ -40,7 +42,13 @@ to try to use mask and filters
 void setup() {    
   Serial.begin(115200);
   START_INIT:
-  if(CAN_OK == CAN.begin(CAN_500KBPS,MCP_8MHz)) {
+  #if CanCrystal == 8
+    if(CAN_OK == CAN.begin(CAN_500KBPS,MCP_8MHz)) {
+#endif
+#if CanCrystal == 16
+    if(CAN_OK == CAN.begin(CAN_500KBPS)) {
+#endif
+  //if(CAN_OK == CAN.begin(CAN_500KBPS,MCP_8MHz)) {
     Serial.println("CAN BUS Shield init ok!");
   } else {
         Serial.println("CAN BUS Shield init fail");
