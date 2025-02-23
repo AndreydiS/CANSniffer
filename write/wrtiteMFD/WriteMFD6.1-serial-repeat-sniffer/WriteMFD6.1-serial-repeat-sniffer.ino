@@ -79,17 +79,17 @@ void loop() {
                 byte j=0;
                 Serial.println(millis(),DEC);  
                 for (byte i = (bufCount); i <= (bitCount-1); i++) {
-                bufToSend[j] = buf[i];
-                //Serial.print(buf[i],HEX); Serial.print(",");  
-                if (j >=7) {
-                    //Serial.println(" S"); 
-                    CAN.sendMsgBuf(canId, extFrame, 8, bufToSend);
-                    j=0;
-                } else {j++;}
+                  bufToSend[j] = buf[i];
+                  //Serial.print(buf[i],HEX); Serial.print(",");  
+                  if (j >=7) {
+                      //Serial.println(" S"); 
+                      CAN.sendMsgBuf(canId, extFrame, 8, bufToSend);
+                      j=0;
+                  } else {j++;}
                 }
                 if (j >0) {
-                //Serial.print(" SL "); Serial.println(j);            
-                CAN.sendMsgBuf(canId, extFrame, j, bufToSend);
+                  //Serial.print(" SL "); Serial.println(j);            
+                  CAN.sendMsgBuf(canId, extFrame, j, bufToSend);
                 }
                 timeLastSent = millis();
             }

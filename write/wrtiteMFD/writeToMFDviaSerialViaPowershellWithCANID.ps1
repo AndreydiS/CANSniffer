@@ -18,7 +18,9 @@
 #$Album = "Tic Tac Toe"
 #$Song = "Verpiss' Dich"
 
-$comPort = "COM7"
+#$comPort = "COM7"
+$comPort = "COM10"
+
 
 $Artist = "Helix Lite"
 $Album = "v.6"
@@ -39,11 +41,11 @@ $CANID = "17333111"
 
 #61,74,20,00,00,05,bf,01,01,0c,00,01,23
 
-$Artist = "f" # max Manowarabcdef12... manowarabcdef12... manowarabcdef123 
+$Artist = "e" # max Manowarabcdef12... manowarabcdef12... manowarabcdef123 
 $Album = "f" #max The Hell Of Steel (...    the hell of steel (7...    
 $Song = "f" #max Blow Your Speakers Blow ... # 2 lines only  `n may be used for new line
 $CANID = "17333111"
-$CANID = "000005bf"
+#$CANID = "000005bf"
 
 
 

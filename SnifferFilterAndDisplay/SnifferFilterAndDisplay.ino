@@ -7,8 +7,8 @@
   #include <mySSD1306.h> 
   
 
-//#define CanCrystal 16 //MHZ
-#define CanCrystal 8 //MHZ
+#define CanCrystal 16 //MHZ
+//#define CanCrystal 8 //MHZ
 
 #define canidVol 0x17333110
 #define canidWheelButton 0x5bf
