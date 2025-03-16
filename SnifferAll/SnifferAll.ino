@@ -5,8 +5,8 @@
 #define CanCrystal 16 //MHZ 8 or 16
 
 INT32U canId = 0x0;
-//INT8U canRtr = 0x0;
-//INT8U canExF = 0x0;
+INT8U canRtr = 0x0;
+INT8U canExF = 0x0;
 unsigned char len = 0;
 unsigned char buf[8];
 String stringOut = "";
@@ -33,15 +33,17 @@ void loop() {
     if (CAN_MSGAVAIL == CAN.checkReceive()) {
         CAN.readMsgBuf(&len, buf);
         canId = CAN.getCanId();
-        //canRtr = CAN.isRemoteRequest();
+       // canRtr = CAN.isRemoteRequest();
         //canExF = CAN.isExtendedFrame();
-        //stringOut = String(canRtr,HEX);
+        stringOut = String(millis());
+        stringOut.concat(",");
+        //stringOut.concat(String(canRtr,HEX));
         //stringOut.concat(",");
         //stringOut.concat(String(canExF,HEX));
-        //stringOut.concat(",n,,");
-        stringOut = String(canId,HEX);
-        //stringOut.concat(String(canId,HEX));
-        stringOut.concat(",");
+        //stringOut.concat(",");
+        //stringOut = String(canId,HEX);
+        stringOut.concat(String(canId,HEX));
+        stringOut.concat(",,");
         for (int i = 0; i<len; i++) {
             stringOut.concat(String(buf[i],HEX));
             stringOut.concat(",");

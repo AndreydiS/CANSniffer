@@ -1,5 +1,8 @@
 #include <SPI.h>
 #include "mcp_can.h"
+
+#define CanCrystal 16 //MHZ 8 or 16
+
 INT32U canId = 0x0;
 unsigned char len = 0;
 unsigned char buf[8] = {0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
@@ -24,7 +27,14 @@ MCP_CAN CAN(10);                                            // Set CS to pin 10
 void setup() {   
 	Serial.begin(115200);
 	START_INIT:
-	if(CAN_OK == CAN.begin(CAN_500KBPS)) {
+  #if CanCrystal == 8
+    if(CAN_OK == CAN.begin(CAN_500KBPS,MCP_8MHz)) {
+  #endif
+  #if CanCrystal == 16
+    if(CAN_OK == CAN.begin(CAN_500KBPS)) {
+  #endif
+
+	//if(CAN_OK == CAN.begin(CAN_500KBPS)) {
         	Serial.println("CAN BUS Shield init ok!");
     	} else {
         	Serial.println("CAN BUS Shield init fail");
