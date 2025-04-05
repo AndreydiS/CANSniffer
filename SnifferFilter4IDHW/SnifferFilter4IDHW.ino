@@ -98,6 +98,7 @@ void loop(){
     CAN.readMsgBuf(&len, buf);
     canId = CAN.getCanId();
      stringOut = "";
+     stringOut.concat(millis());
       //canRtr = CAN.isRemoteRequest();
       //canExF = CAN.isExtendedFrame();
       //stringOut = String(canRtr,HEX);
@@ -105,9 +106,9 @@ void loop(){
       //stringOut.concat(",");
       //stringOut.concat(String(canExF,HEX));
       if ((canId == 0x5bf)) {
-        stringOut.concat(",y,WheelButtonAnchor,");
+        stringOut.concat(",");
       } else {
-        stringOut.concat(",n,,");  
+        stringOut.concat(",");  
       }
       stringOut.concat(String(canId,HEX));
       for (i=0; i<len; i++) {
@@ -118,7 +119,9 @@ void loop(){
         stringOut.concat(String(buf[i],HEX));
       }
     //  if ((canId == 0x6af)||(canId == 0x5bf)||(canId==0x17333111)||(canId==0x17330b10)) {
-      Serial.println(stringOut);
+      Serial.print("<");  
+      Serial.print(stringOut);
+      Serial.println(">");
     //  }
       
     //  }
