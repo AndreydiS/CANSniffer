@@ -60,9 +60,18 @@ do {
      [console]::Write($newText)
      [console]::SetCursorPosition(0,0)
      Start-Sleep -Milliseconds 100
-#}
-} until ([System.Console]::KeyAvailable)
 
+     if ([System.Console]::KeyAvailable){
+        $k=[System.Console]::ReadKey();
+        if ($k.Key -eq "Q"){
+            break;
+        }
+    }
+#}
+#} until ([System.Console]::KeyAvailable)
+} until ($true)
+
+#do {if ([System.Console]::KeyAvailable){$k=[System.Console]::ReadKey();if ($k.Key -eq "Q"){break;}else{write-host $k.Key}}} while ($true)
 
 $port1.Close()
 
