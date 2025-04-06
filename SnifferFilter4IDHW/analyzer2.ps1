@@ -12,13 +12,37 @@ do {
 
     $c -split "`r`n" | % {
         if ($_ -like "<*>") {
-            $la = $_ -split ","
-            $canid = $la[2] #[Convert]::ToInt32($a, 16)
+            $s = ($_ -replace "<", "") -replace ">", ""
+            $la = $s -split ","
+            $canid = $la[1] #[Convert]::ToInt32($a, 16)
+
+            $stringToHash = ""
+            $i=0;
+            ($s -split ",") | % {
+                if ($i -eq 1) {
+                    if ($_.Length -lt 7) {
+                        $stringToHash += $_ + "     ,";
+                    } else {
+                        $stringToHash += $_ + ",";
+                    }
+                    
+                } else {
+                    $stringToHash += $_ + ",";
+                }
+                $i++;
+            }
+
             if ($canid -ne $null) {
                     if ($hash[$canid] -eq $null) {
-                        $hash.Add($canid, $_)
+                        $time = 0
+                        $period = 0
+                        #$hash.Add($canid, $s) #newcanid
+                        $hash.Add($canid, $stringToHash) #newcanid
                     } else {
-                        $hash[$canid] = $_
+                        $time = $la[0]# -replace "<", ""
+                        #$period = $time-($hash[$canid] -split ",")[0]
+                        #$hash[$canid] = $s + "; " + $period +"ms" #update existing
+                        $hash[$canid] = $stringToHash + "; " + $period +"ms" #update existing
                     }
             }
         }
