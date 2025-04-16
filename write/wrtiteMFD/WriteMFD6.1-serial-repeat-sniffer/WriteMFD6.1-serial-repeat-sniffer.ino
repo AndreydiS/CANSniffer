@@ -1,12 +1,9 @@
 #include <SPI.h>
-#include "mcp_can.h"
+#include <mcp_can.h>
 
-#define CanCrystal 16 //MHZ 8 or 16
+#define CanCrystal 16 //MHZ 8(on my controllers) or 16(on UNO)
 
 MCP_CAN CAN(10); // Set CS to pin 10
-
-#define DEFcanId 0x17333111
-#define delayLastMessage 100
 
 INT32U canId = 0x0;
 INT32U tempCanId = 0x0;

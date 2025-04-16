@@ -3,127 +3,145 @@
 
 #define CanCrystal 16 //MHZ 8(on my controllers) or 16(on UNO)
 
-#define arraySize 4
-
-unsigned long arrCanID[arraySize];
-int arrID = 0;
-byte i = 0;
-byte blnPrint = 0;
-
-int incomingByte;
-unsigned long lngWord=0;
+MCP_CAN CAN(10); // Set CS to pin 10
 
 INT32U canId = 0x0;
-//INT8U canRtr = 0x0;
-//INT8U canExF = 0x0;
+INT32U tempCanId = 0x0;
+
+byte sniffingMode = 0;
 byte stdFilterCount = 0;
 byte extFilterCount = 2;
-unsigned char len = 0;
-unsigned char buf[8];
+byte extFrame = 0;
 String stringOut = "";
-MCP_CAN CAN(10);                                            // Set CS to pin 10 //3 for tests only
+unsigned char len = 0;
 
-/*
-to try to use mask and filters
-  standard canId, in case we need only 1(or 2 canIDs)
-    CAN.init_Mask(0, 0, 0x07ff); //bin 111 1111 1111    //1fffffff   
-    CAN.init_Filt(0, 0, 0x740);  //canid1
-    CAN.init_Filt(1, 0, 0x4c0);  //canid2
+byte incomingByte;
+byte bitCount=0;
+byte availableBytes = 0;
+byte bufsize = 0;
+unsigned long timeLastByteReceived = 0;
+unsigned long timeLastSent = 0;
 
-    CAN.init_Mask(1, 1, 0x1fffffff); //bin 111 1111 1111    //   
-    CAN.init_Filt(0, 1, 0x17330b10);  //canid1
-    CAN.init_Filt(1, 1, 0x17330a10);  //canid2
+//unsigned char buf[256];
+unsigned char buf[16];
+unsigned char bufs[8];
+unsigned char bufToSend[8];
 
-
-    CAN.init_Mask(0, 0, 0x0700); //bin 111 0000 0000
-    CAN.init_Filt(0, 0, 0x700);  //all canids 0x7**
-*/
-
-void setup() {    
-  Serial.begin(115200);
-  START_INIT:
-  #if CanCrystal == 8
-    if(CAN_OK == CAN.begin(CAN_500KBPS,MCP_8MHz)) {
-#endif
-#if CanCrystal == 16
-    if(CAN_OK == CAN.begin(CAN_500KBPS)) {
-#endif
-  //if(CAN_OK == CAN.begin(CAN_500KBPS,MCP_8MHz)) {
-    Serial.println("CAN BUS Shield init ok!");
-  } else {
-        Serial.println("CAN BUS Shield init fail");
-        delay(100);
-        goto START_INIT;
-    }
+void setup() {
+  //Serial.begin(115200);
+  Serial.begin(19200);
+	START_INIT:
+    #if CanCrystal == 8
+      if(CAN_OK == CAN.begin(CAN_500KBPS,MCP_8MHz)) {
+    #endif
+    #if CanCrystal == 16
+      if(CAN_OK == CAN.begin(CAN_500KBPS)) {
+    #endif
+        Serial.println("CAN ok. CMD send: 74 20 <canid_4b> <payloadlen_1b> <payload>");
+        Serial.println("CAN ok. CMD sniff: 73 20 <canid_4b>");
+      } else {
+          Serial.println("CAN BUS Shield init fail");
+          delay(1000);
+          //goto START_INIT;
+      }
 }
 
-void loop(){
-  if (Serial.available() > 0) {
-    incomingByte = Serial.read();
-    if (incomingByte == 0x0a) {
-      if (lngWord > 0x07ff) {
+void loop() {
+  if (((millis() - timeLastByteReceived) > 100) && (bitCount>0)) {
+    bitCount=0;
+    Serial.println("reset wrong input");
+  }
+
+  if (bitCount>5) {
+    if (bitCount == 6) {
+      canId = 0x00;
+      for (byte i = 2; i <= 5; i++) {
+        //Serial.print(buf[i],HEX);
+        //Serial.print("~");
+        //Serial.println();
+        tempCanId = buf[i];
+        canId = canId*0x100 + tempCanId;
+      }
+      if (canId > 0x7ff) {extFrame = 1;} else {extFrame = 0;}
+      Serial.print("CAN ID: "); Serial.print(canId, HEX); 
+      Serial.print(" Ext: ");   Serial.println(extFrame, HEX); 
+    }
+    if ((bitCount>5)&&(buf[0] == 0x73)) { //sniffing
+      Serial.println("Sniffing ");
+      sniffingMode = 1;
+      if (canId == 0x0) {
+        Serial.print("Sniffing all");
+      } else {
+        if (extFrame == 1) {
           CAN.init_Mask(1, 1, 0x1fffffff);
-          CAN.init_Filt(extFilterCount, 1, lngWord);
-          Serial.println("ext");
+          CAN.init_Filt(extFilterCount, 1, canId);
+          Serial.print("ext ");
           Serial.println(extFilterCount);
           extFilterCount++;
           if (extFilterCount > 5) {
             extFilterCount = 2;
           }
-
-      } else {
+        } else {
           CAN.init_Mask(0, 0, 0x07ff);
-          CAN.init_Filt(stdFilterCount, 0, lngWord);
-          Serial.println("std");
+          CAN.init_Filt(stdFilterCount, 0, canId);
+          Serial.print("std ");
           Serial.println(stdFilterCount);
           stdFilterCount++;
           if (stdFilterCount > 1) {
             stdFilterCount = 0;
           }
+        }
       }
-      Serial.println(lngWord,HEX);
-      arrCanID[arrID] = lngWord;  
-      lngWord=0;
-    } else {
-      lngWord=lngWord<<4;
-      if ((incomingByte > 0x2f) && (incomingByte < 0x3a)) {
-          lngWord = lngWord | (incomingByte-0x30);
-      } else if ((incomingByte > 0x60) && (incomingByte < 0x67)) {
-          lngWord = lngWord | (incomingByte-0x57);
-      }
+      bitCount = 0;
     }
+    if ((bitCount>6)&&(buf[0] == 0x74)&&(bitCount>=(buf[6]+7))) { //sending
+      sniffingMode = 0;
+      Serial.println("Sending ");
+      sniffingMode = 0;
+      byte payloadLength = 1;
+      payloadLength = buf[6];
+      Serial.print("payload len: ");   Serial.println(payloadLength, HEX); 
+      byte j=0;
+      Serial.print("payload: ");
+      for (byte i = 7; i <= (bitCount-1); i++) {
+          bufToSend[j] = buf[i];
+          j++;
+          Serial.print(buf[i],HEX); Serial.print(",");  
+      }
+      CAN.sendMsgBuf(canId, extFrame, payloadLength, bufToSend);
+      Serial.println("");
+      bitCount = 0;
+    }    
   }
 
-  if (CAN_MSGAVAIL == CAN.checkReceive()) {
-    CAN.readMsgBuf(&len, buf);
-    canId = CAN.getCanId();
-     stringOut = "";
-     stringOut.concat(millis());
-      //canRtr = CAN.isRemoteRequest();
-      //canExF = CAN.isExtendedFrame();
-      //stringOut = String(canRtr,HEX);
-      //stringOut.concat(",-");
-      //stringOut.concat(",");
-      //stringOut.concat(String(canExF,HEX));
-      if ((canId == 0x5bf)) {
-        stringOut.concat(",");
-      } else {
-        stringOut.concat(",");  
-      }
-      stringOut.concat(String(canId,HEX));
-      for (i=0; i<len; i++) {
-        stringOut.concat(",");
-        if (buf[i] < 0x10) {
-          stringOut.concat(" ");
+  if (sniffingMode == 1) {
+    if (CAN_MSGAVAIL == CAN.checkReceive()) {
+      CAN.readMsgBuf(&len, bufs);
+      canId = CAN.getCanId();
+      stringOut = "<";
+      stringOut.concat(millis());
+        stringOut.concat(String(canId,HEX));
+        for (byte i=0; i<len; i++) {
+          stringOut.concat(",");
+          if (bufs[i] < 0x10) {
+            stringOut.concat(" ");
+          }
+          stringOut.concat(String(bufs[i],HEX));
         }
-        stringOut.concat(String(buf[i],HEX));
-      }
-    //  if ((canId == 0x6af)||(canId == 0x5bf)||(canId==0x17333111)||(canId==0x17330b10)) {
-      Serial.print("<");  
-      Serial.print(stringOut);
-      Serial.println(">");
-    //  }
-      
-    //  }
-	}
+        stringOut.concat(">"); 
+        Serial.println(stringOut);
+        //Serial.println(">");
+    }
+  }
+  
+  if (Serial.available() > 0) { //populating buffer
+    incomingByte = Serial.read();
+    //Serial.print(incomingByte,HEX);
+    //Serial.print(",");
+    //Serial.println();
+
+    buf[bitCount] = incomingByte;
+    timeLastByteReceived = millis();
+    bitCount++;
+  }
 }

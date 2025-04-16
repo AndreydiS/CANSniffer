@@ -1,7 +1,7 @@
 #include <SPI.h>
-#include "mcp_can.h"
+#include <mcp_can.h>
 
-#define CanCrystal 16 //MHZ 8 or 16
+#define CanCrystal 16 //MHZ 8(on my controllers) or 16(on UNO)
 
 MCP_CAN CAN(10); // Set CS to pin 10
 
@@ -28,7 +28,7 @@ unsigned char buf[256];
 unsigned char bufToSend[8];
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
 	START_INIT:
     #if CanCrystal == 8
       if(CAN_OK == CAN.begin(CAN_500KBPS,MCP_8MHz)) {
