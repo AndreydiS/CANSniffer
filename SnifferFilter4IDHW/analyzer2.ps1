@@ -1,9 +1,40 @@
+$ReadMillisecondsDelay = 20;
+
 $port1 = new-Object System.IO.Ports.SerialPort COM10,115200
+#$port1 = new-Object System.IO.Ports.SerialPort COM10,57600
 $port1.Open()
 sleep 1
 
+$b = 0x73,0x20,0x00,0x00,0x00,0x00
+
+$port1.Write($b,0,6)
+
+function addSpaces($intNumberOfSpaces) {
+    if ($intNumberOfSpaces -lt 0) {
+        return "";
+    } else {
+        return (" "*$intNumberOfSpaces); 
+    }
+}
+
+
 $boolRecord=$false;
 $arrRecord = @();
+
+$hashKnownCanids = @{}
+$hashKnownCanids.add("366","turn signal")
+$hashKnownCanids.add("5bf","wheel button")
+$hashKnownCanids.add("663","voltage")
+$hashKnownCanids.add("668","climat buttons to HU")
+$hashKnownCanids.add("6af","from HU to camera control bri, contrast, etc")
+$hashKnownCanids.add("6b4","VIN")
+$hashKnownCanids.add("17330110","Climat to HU display")
+$hashKnownCanids.add("17331110","Time on HU")
+$hashKnownCanids.add("17333110","HU volume")
+$hashKnownCanids.add("17333111","mess from HU to MFD")
+
+$hashDontSendCanids = @{}
+$hashDontSendCanids.add("6b4","VIN")
 
 $hash = @{}
 $exitDo = $false;
@@ -23,12 +54,7 @@ do {
             $i=0;
             ($s -split ",") | % {
                 if ($i -eq 1) {
-                    $stringToHash += $_ + (addSpaces(7-$_.Length)) + ",";
-                    # if ($_.Length -lt 7) {
-                    #     $stringToHash += $_ + "     ,";
-                    # } else {
-                    #     $stringToHash += $_ + ",";
-                    # }                    
+                    $stringToHash += $_ + (addSpaces(8-$_.Length)) + ",";
                 } else {
                     $stringToHash += $_ + ",";
                 }
@@ -43,11 +69,13 @@ do {
                     } else {
                         $time = $la[0]# -replace "<", ""
                         $period = $time-($hash[$canid] -split ",")[0]
-                        stringToHash = stringToHash + (addSpaces(42-$stringToHash.Length))
-                        $hash[$canid] = $stringToHash + "; " + (addSpaces(6-$period.ToString().Length)) + $period +"ms" #update existing
+                        $stringToHash = $stringToHash + (addSpaces(42-$stringToHash.Length))
+                        $hash[$canid] = $stringToHash + "; " + (addSpaces(6-$period.ToString().Length)) + $period +"ms " + $hashKnownCanids[$canid] #update existing
                     }
             }
-            $arrRecord += $stringToHash;
+            if ($boolRecord) {
+                $arrRecord += $stringToHash;
+            }
         }
     }
     $newText = (
@@ -62,7 +90,7 @@ do {
      [console]::SetCursorPosition(0,0)
      [console]::Write($newText)
      [console]::SetCursorPosition(0,0)
-     Start-Sleep -Milliseconds 25;#50-100
+     Start-Sleep -Milliseconds $ReadMillisecondsDelay;#50-100
 
      if ([System.Console]::KeyAvailable){
         $k=[System.Console]::ReadKey();
@@ -74,24 +102,19 @@ do {
     }
 } until ($false)
 
+$fileout = "recorded.txt"
 if ($boolRecord) {
+    cls
     write-host "Recorded Packets=========================================="
-    foreach($e in $arrRecord) {
-        write-host $e;
+    $time=0;
+    "" | out-file $fileout
+    foreach($s in $arrRecord) {
+        $s | out-file $fileout -Append
     }
 }
 
 
 $port1.Close()
-
-
-function addSpaces($intNumberOfSpaces) {
-    if ($intNumberOfSpaces -lt 0) {
-        return "";
-    } else {
-        return (" "*$intNumberOfSpaces); 
-    }
-}
 
 # for() {
 #     $rows = [console]::WindowHeight - 2 # account for headers

@@ -22,13 +22,13 @@ byte bufsize = 0;
 unsigned long timeLastByteReceived = 0;
 unsigned long timeLastSent = 0;
 
-//unsigned char buf[256];
 unsigned char buf[16];
 unsigned char bufs[8];
 unsigned char bufToSend[8];
 
 void setup() {
   Serial.begin(115200);
+  //Serial.begin(57600);
   //Serial.begin(19200);
 	START_INIT:
     #if CanCrystal == 8
@@ -55,16 +55,16 @@ void loop() {
   if (bitCount>5) {
     if (bitCount == 6) {
       canId = 0x00;
-      for (byte i = 2; i <= 5; i++) {
-        //Serial.print(buf[i],HEX);
-        //Serial.print("~");
-        //Serial.println();
+      for (byte i = 2; i <= 5; i++) {        
+        // Serial.print(buf[i],HEX);
+        // Serial.print("~");
+        // Serial.println();
         tempCanId = buf[i];
         canId = canId*0x100 + tempCanId;
       }
       if (canId > 0x7ff) {extFrame = 1;} else {extFrame = 0;}
-      Serial.print("CAN ID: "); Serial.print(canId, HEX); 
-      Serial.print(" Ext: ");   Serial.println(extFrame, HEX); 
+      Serial.print("CAN: "); Serial.print(canId, HEX); 
+      //Serial.print(" Ext: ");   Serial.println(extFrame, HEX); 
     }
     if ((bitCount>5)&&(buf[0] == 0x73)) { //sniffing
       Serial.println("Sniffing ");
@@ -96,13 +96,12 @@ void loop() {
     }
     if ((bitCount>6)&&(buf[0] == 0x74)&&(bitCount>=(buf[6]+7))) { //sending
       sniffingMode = 0;
-      Serial.println("Sending ");
+      //Serial.println("Send ");
       sniffingMode = 0;
       byte payloadLength = 1;
       payloadLength = buf[6];
-      Serial.print("payload len: ");   Serial.println(payloadLength, HEX); 
+      Serial.print("l ");   Serial.print(payloadLength, HEX); Serial.print("d ");
       byte j=0;
-      Serial.print("payload: ");
       for (byte i = 7; i <= (bitCount-1); i++) {
           bufToSend[j] = buf[i];
           j++;
@@ -120,6 +119,7 @@ void loop() {
       canId = CAN.getCanId();
       stringOut = "<";
       stringOut.concat(millis());
+      stringOut.concat(",");
         stringOut.concat(String(canId,HEX));
         for (byte i=0; i<len; i++) {
           stringOut.concat(",");
