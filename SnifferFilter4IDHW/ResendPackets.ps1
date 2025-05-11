@@ -3,7 +3,7 @@ $fileout = "recorded.txt"
 $arrRecord = Get-Content $fileout
 
 $port1 = new-Object System.IO.Ports.SerialPort COM10,115200
-$port1 = new-Object System.IO.Ports.SerialPort COM3,115200
+#$port1 = new-Object System.IO.Ports.SerialPort COM3,115200
 #$port1 = new-Object System.IO.Ports.SerialPort COM10,57600
 $port1.Open()
 
@@ -18,15 +18,19 @@ foreach($s in $arrRecord) {
         #$ticks=(get-date).ticks/10000;write-host "   ms3 " ($ticks -$prevticks);$prevticks = $ticks
         $canid=[System.Convert]::ToInt32($la[1].trim(), 16)
         #$ticks=(get-date).ticks/10000;write-host "   ms4 " ($ticks -$prevticks);$prevticks = $ticks
-        if ($canid -gt 0x0) { #all
+
+        #if ($canid -gt 0x0) { #all
         #if ($canid -le 0x7ff) { #std only
         #if ($canid -gt 0x7ff) { #ext only
         #if (($canid -gt 0x7ff) -and ($canid -le 0x17330B10)) {
         #if (($canid -gt 0x17330B10) -and ($canid -le 0x17330910)) {
         #if (($canid -gt 0x17330910)) {
-        #if (($canid -gt 0x17330B10) -and ($canid -le 0x17331310)) {
-        #if (($canid -gt 0x17330B10) -and ($canid -le 0x17331110)) {
+        #if (($canid -gt 0x17330910) -and ($canid -le 0x17331310)) {
+        #if (($canid -gt 0x17330910) -and ($canid -le 0x17331110)) {
         #if (($canid -gt 0x17330f10) -and ($canid -le 0x17331110)) {
+
+        #if (($canid -eq 0x17330F10)) { #outside temp to HU
+        if (($canid -eq 0x17333110)) { #messages from HU to MFD
 
             #if (($canid -gt 0x17331110) -and ($canid -le 0x17331310)) {
 

@@ -100,7 +100,7 @@ void loop() {
       sniffingMode = 0;
       byte payloadLength = 1;
       payloadLength = buf[6];
-      Serial.print("l ");   Serial.print(payloadLength, HEX); Serial.print("d ");
+      Serial.print(" l ");   Serial.print(payloadLength, HEX); Serial.print(" d ");
       byte j=0;
       for (byte i = 7; i <= (bitCount-1); i++) {
           bufToSend[j] = buf[i];
