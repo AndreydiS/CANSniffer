@@ -23,6 +23,8 @@ $arrRecord = @();
 
 $hashKnownCanids = @{}
 $hashKnownCanids.add("fd","esp and speed")
+$hashKnownCanids.add("40","airbag")
+$hashKnownCanids.add("101","esp")
 $hashKnownCanids.add("107","MO. speed gear oilPres rpm boost")
 $hashKnownCanids.add("116","ESP. wheel rotation")
 $hashKnownCanids.add("30b","Kombi. warning lights")
@@ -56,11 +58,20 @@ $hashKnownCanids.add("6b7","Kombi. milage servicelife fuel in tank outside temp"
 $hashKnownCanids.add("6b8","Kombi. tire circ. fuel levels")
 $hashKnownCanids.add("17330110","Climat to HU display")
 $hashKnownCanids.add("17331110","Time on HU")
+$hashKnownCanids.add("17332811","Telephone called numbers to MFD")
 $hashKnownCanids.add("17333110","HU volume")
 $hashKnownCanids.add("17333111","mess from HU to MFD")
 
+
+
 $hashDontSendCanids = @{}
-$hashDontSendCanids.add("6b4","VIN")
+$hashDontSendCanids.add("101","n")
+$hashDontSendCanids.add("107","n")
+$hashDontSendCanids.add("116","n")
+$hashDontSendCanids.add("366","n")
+$hashDontSendCanids.add("520","n")
+$hashDontSendCanids.add("5bf","n")
+$hashDontSendCanids.add("6b4","n")
 
 $hash = @{}
 $exitDo = $false;
@@ -88,6 +99,7 @@ do {
             }
 
             if ($canid -ne $null) {
+                    if ($hashDontSendCanids[$canid] -eq $null) {
                     if ($hash[$canid] -eq $null) {
                         $time = 0
                         $period = 0
@@ -98,6 +110,7 @@ do {
                         $stringToHash = $stringToHash + (addSpaces(42-$stringToHash.Length))
                         $hash[$canid] = $stringToHash + "; " + (addSpaces(6-$period.ToString().Length)) + $period +"ms " + $hashKnownCanids[$canid] #update existing
                     }
+                }
             }
             if ($boolRecord) {
                 $arrRecord += $stringToHash;

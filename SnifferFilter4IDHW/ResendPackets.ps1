@@ -30,8 +30,10 @@ foreach($s in $arrRecord) {
         #if (($canid -gt 0x17330f10) -and ($canid -le 0x17331110)) {
 
         #if (($canid -eq 0x17330F10)) { #outside temp to HU
-        if (($canid -eq 0x17333110)) { #messages from HU to MFD
+        #if (($canid -eq 0x17333110)) { #messages from HU to MFD
+        if (($canid -eq 0x17332811)) { #
 
+            
             #if (($canid -gt 0x17331110) -and ($canid -le 0x17331310)) {
 
             
